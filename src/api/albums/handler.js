@@ -28,7 +28,12 @@ class AlbumsHandler {
     return {
       status: 'success',
       data: {
-        album
+        album: {
+          id: album[0].id,
+          name: album[0].name,
+          year: album[0].year,
+          songs: album[1]
+        }
       }
     }
   }
