@@ -6,8 +6,8 @@ class AlbumsHandler {
 
   async postAlbumHandler (request, h) {
     this._validator.validateAlbumPayload(request.payload)
-    const { name = 'Untitled', year = 2000 } = request.payload
 
+    const { name = 'Untitled', year = 2000 } = request.payload
     const albumId = await this._service.addAlbum({ name, year })
 
     const response = h.response({
@@ -17,6 +17,7 @@ class AlbumsHandler {
         albumId
       }
     })
+
     response.code(201)
     return response
   }
@@ -40,6 +41,7 @@ class AlbumsHandler {
 
   async putAlbumByIdHandler (request, h) {
     this._validator.validateAlbumPayload(request.payload)
+
     const { name, year } = request.payload
     const { id } = request.params
 

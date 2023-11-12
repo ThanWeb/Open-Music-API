@@ -34,6 +34,7 @@ const init = async () => {
         status: 'success',
         message: 'Welcome to Open Music API'
       })
+
       response.code(201)
       return response
     }
@@ -57,6 +58,7 @@ const init = async () => {
 
   server.ext('onPreResponse', (request, h) => {
     const { response } = request
+
     if (response instanceof Error) {
       if (response instanceof ClientError) {
         const newResponse = h.response({
