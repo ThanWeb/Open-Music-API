@@ -2,6 +2,7 @@ const { Pool } = require('pg')
 const { nanoid } = require('nanoid')
 const NotFoundError = require('../exceptions/NotFoundError')
 const InvariantError = require('../exceptions/InvariantError')
+const AuthorizationError = require('../exceptions/AuthorizationError')
 const { mapDBToPlaylistModel } = require('../utils')
 
 class PlaylistsService {
@@ -50,6 +51,25 @@ class PlaylistsService {
 
     if (!result.rows.length) {
       throw new NotFoundError('Playlist gagal dihapus. Id tidak ditemukan')
+    }
+  }
+
+  async verifyPlaylistOwner (id, owner) {
+    const query = {
+      text: 'SELECT * FROM playlists WHERE id = $1',
+      values: [id]
+    }
+
+    const result = await this._pool.query(query)
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Playlist tidak ditemukan')
+    }
+
+    const playlist = result.rows[0]
+
+    if (playlist.owner !== owner) {
+      throw new AuthorizationError('Anda tidak berhak mengakses resource ini')
     }
   }
 }
