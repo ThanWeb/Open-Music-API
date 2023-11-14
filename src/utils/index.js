@@ -39,13 +39,13 @@ const mapDBToSongModel = ({
 const mapDBToPlaylistModel = ({
   id,
   name,
-  owner,
+  username,
   created_at,
   updated_at
 }) => ({
   id,
   name,
-  owner,
+  username,
   createdAt: created_at,
   updatedAt: updated_at
 })
