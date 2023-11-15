@@ -42,6 +42,20 @@ class PlaylistsService {
     return result.rows.map(mapDBToPlaylistModel)
   }
 
+  async getPlaylistById (id, owner) {
+    const query = {
+      text: `SELECT playlists.id, playlists.name, users.username FROM playlists
+      INNER JOIN users
+      ON playlists.owner = users.id
+      WHERE playlists.owner = $1
+      AND playlists.id = $2`,
+      values: [owner, id]
+    }
+
+    const result = await this._pool.query(query)
+    return result.rows.map(mapDBToPlaylistModel)[0]
+  }
+
   async deletePlaylistById (id) {
     const query = {
       text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
