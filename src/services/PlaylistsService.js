@@ -3,7 +3,6 @@ const { nanoid } = require('nanoid')
 const NotFoundError = require('../exceptions/NotFoundError')
 const InvariantError = require('../exceptions/InvariantError')
 const AuthorizationError = require('../exceptions/AuthorizationError')
-const { mapDBToPlaylistModel } = require('../utils')
 
 class PlaylistsService {
   constructor () {
@@ -39,7 +38,7 @@ class PlaylistsService {
     }
 
     const result = await this._pool.query(query)
-    return result.rows.map(mapDBToPlaylistModel)
+    return result.rows
   }
 
   async getPlaylistById (id, owner) {
@@ -53,7 +52,7 @@ class PlaylistsService {
     }
 
     const result = await this._pool.query(query)
-    return result.rows.map(mapDBToPlaylistModel)[0]
+    return result.rows[0]
   }
 
   async deletePlaylistById (id) {
