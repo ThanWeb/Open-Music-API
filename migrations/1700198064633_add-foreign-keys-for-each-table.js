@@ -1,5 +1,3 @@
-exports.shorthands = undefined
-
 exports.up = (pgm) => {
   pgm.addConstraint('songs', 'fk-songs.album_id-albums.id', 'FOREIGN KEY(album_id) REFERENCES albums(id) ON DELETE CASCADE')
   pgm.addConstraint('playlist_songs', 'fk-playlist_songs.song_id-songs.id', 'FOREIGN KEY(song_id) REFERENCES songs(id) ON DELETE CASCADE')

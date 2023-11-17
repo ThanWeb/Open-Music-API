@@ -13,11 +13,10 @@ class PlaylistsService {
   async addPlaylist ({ name, owner }) {
     const id = `playlist-${nanoid(16)}`
     const createdAt = new Date().toISOString()
-    const updatedAt = createdAt
 
     const query = {
-      text: 'INSERT INTO playlists VALUES($1, $2, $3, $4, $5) RETURNING id',
-      values: [id, name, owner, createdAt, updatedAt]
+      text: 'INSERT INTO playlists VALUES($1, $2, $3, $4) RETURNING id',
+      values: [id, name, owner, createdAt]
     }
 
     const result = await this._pool.query(query)
@@ -68,7 +67,7 @@ class PlaylistsService {
 
     const result = await this._pool.query(query)
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Playlist gagal dihapus. Id tidak ditemukan')
     }
   }
@@ -81,7 +80,7 @@ class PlaylistsService {
 
     const result = await this._pool.query(query)
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Playlist tidak ditemukan')
     }
 
