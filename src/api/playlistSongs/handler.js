@@ -14,15 +14,15 @@ class PlaylistSongsHandler {
     const { songId } = request.payload
     const { id: credentialId } = request.auth.credentials
 
-    await this._playlistsService.verifyPlaylistOwner(id, credentialId)
-    const song = await this._songsService.getSongById(songId)
+    await this._playlistsService.verifyPlaylistAccess(id, credentialId)
+    await this._songsService.getSongById(songId)
 
     await this._playlistSongsService.addPlaylistSong({
       playlistId: id, songId
     })
 
     await this._playlistSongActivitiesService.addPlaylistSongActivity({
-      playlistId: id, songId: song.id, userId: credentialId, action: 'add'
+      playlistId: id, songId, userId: credentialId, action: 'add'
     })
 
     const response = h.response({
@@ -38,7 +38,7 @@ class PlaylistSongsHandler {
     const playlistId = request.params.id
     const { id: credentialId } = request.auth.credentials
 
-    await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId)
+    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId)
     const { id, name, username } = await this._playlistsService.getPlaylistById(playlistId, credentialId)
     const songs = await this._playlistSongsService.getPlaylistSongs(playlistId)
 
@@ -62,12 +62,12 @@ class PlaylistSongsHandler {
     const { songId } = request.payload
     const { id: credentialId } = request.auth.credentials
 
-    await this._playlistsService.verifyPlaylistOwner(id, credentialId)
-    const song = await this._songsService.getSongById(songId)
+    await this._playlistsService.verifyPlaylistAccess(id, credentialId)
+    await this._songsService.getSongById(songId)
     await this._playlistSongsService.deletePlaylistSongById(songId, id)
 
     await this._playlistSongActivitiesService.addPlaylistSongActivity({
-      playlistId: id, songId: song.id, userId: credentialId, action: 'delete'
+      playlistId: id, songId, userId: credentialId, action: 'delete'
     })
 
     return {
