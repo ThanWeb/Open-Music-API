@@ -5,12 +5,13 @@ const InvariantError = require('../exceptions/InvariantError')
 const AuthorizationError = require('../exceptions/AuthorizationError')
 
 class PlaylistsService {
-  constructor () {
+  constructor (collaborationsService) {
     this._pool = new Pool()
+    this._collaborationsService = collaborationsService
   }
 
   async addPlaylist ({ name, owner }) {
-    const id = nanoid(16)
+    const id = `playlist-${nanoid(16)}`
     const createdAt = new Date().toISOString()
     const updatedAt = createdAt
 
@@ -31,9 +32,11 @@ class PlaylistsService {
   async getPlaylists (owner) {
     const query = {
       text: `SELECT playlists.id, playlists.name, users.username FROM playlists
-      INNER JOIN users
+      LEFT JOIN collaborations
+      ON playlists.id = collaborations.playlist_id
+      LEFT JOIN users
       ON playlists.owner = users.id
-      WHERE playlists.owner = $1`,
+      WHERE playlists.owner = $1 OR collaborations.user_id = $1`,
       values: [owner]
     }
 
@@ -44,9 +47,11 @@ class PlaylistsService {
   async getPlaylistById (id, owner) {
     const query = {
       text: `SELECT playlists.id, playlists.name, users.username FROM playlists
-      INNER JOIN users
+      LEFT JOIN collaborations
+      ON playlists.id = collaborations.playlist_id
+      LEFT JOIN users
       ON playlists.owner = users.id
-      WHERE playlists.owner = $1
+      WHERE playlists.owner = $1 OR collaborations.user_id = $1
       AND playlists.id = $2`,
       values: [owner, id]
     }
@@ -84,6 +89,22 @@ class PlaylistsService {
 
     if (playlist.owner !== owner) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini')
+    }
+  }
+
+  async verifyPlaylistAccess (playlistId, userId) {
+    try {
+      await this.verifyPlaylistOwner(playlistId, userId)
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error
+      }
+
+      try {
+        await this._collaborationsService.verifyCollaborator(playlistId, userId)
+      } catch {
+        throw error
+      }
     }
   }
 }
