@@ -31,6 +31,10 @@ const PlaylistSongsValidator = require('./validator/playlistSongs')
 const playlistSongActivities = require('./api/playlistSongActivities')
 const PlaylistSongActivitiesService = require('./services/PlaylistSongActivitiesService')
 
+const collaborations = require('./api/collaborations')
+const CollaborationsService = require('./services/CollaborationsService')
+const CollaborationsValidator = require('./validator/collaborations')
+
 const ClientError = require('./exceptions/ClientError')
 
 const init = async () => {
@@ -38,7 +42,8 @@ const init = async () => {
   const songsService = new SongsService()
   const usersService = new UsersService()
   const authenticationsService = new AuthenticationsService()
-  const playlistsService = new PlaylistsService()
+  const collaborationsService = new CollaborationsService()
+  const playlistsService = new PlaylistsService(collaborationsService)
   const playlistSongsService = new PlaylistSongsService()
   const playlistSongActivitiesService = new PlaylistSongActivitiesService()
 
@@ -78,13 +83,10 @@ const init = async () => {
     method: 'GET',
     path: '/',
     handler: (request, h) => {
-      const response = h.response({
+      return {
         status: 'success',
         message: 'Welcome to Open Music API'
-      })
-
-      response.code(201)
-      return response
+      }
     }
   })
 
@@ -141,6 +143,15 @@ const init = async () => {
       options: {
         playlistSongActivitiesService,
         playlistsService
+      }
+    },
+    {
+      plugin: collaborations,
+      options: {
+        collaborationsService,
+        playlistsService,
+        usersService,
+        validator: CollaborationsValidator
       }
     }
   ])
