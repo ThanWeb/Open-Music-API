@@ -54,7 +54,8 @@ const init = async () => {
     info: {
       title: 'Open Music API Documentation',
       version: '2.0'
-    }
+    },
+    schemes: ['http']
   }
 
   const server = Hapi.server({
@@ -92,15 +93,18 @@ const init = async () => {
   server.route({
     method: 'GET',
     path: '/',
-    handler: (request, h) => {
-      return {
-        status: 'success',
-        message: 'Welcome to Open Music API'
-      }
+    handler: (request, reply) => {
+      return reply.redirect('documentation').permanent()
     }
   })
 
   await server.register([
+    Inert,
+    Vision,
+    {
+      plugin: HapiSwagger,
+      options: swaggerOptions
+    },
     {
       plugin: albums,
       options: {
@@ -163,12 +167,6 @@ const init = async () => {
         usersService,
         validator: CollaborationsValidator
       }
-    },
-    Inert,
-    Vision,
-    {
-      plugin: HapiSwagger,
-      options: swaggerOptions
     }
   ])
 
