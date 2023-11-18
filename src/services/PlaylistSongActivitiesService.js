@@ -8,7 +8,7 @@ class PlaylistSongActivitiesService {
   }
 
   async addPlaylistSongActivity ({ playlistId, songId, userId, action }) {
-    const id = nanoid(16)
+    const id = `activity-${nanoid(16)}`
     const time = new Date().toISOString()
 
     const query = {
