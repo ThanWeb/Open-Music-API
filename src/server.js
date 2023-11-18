@@ -1,7 +1,10 @@
 require('dotenv').config()
 
-const Hapi = require('@hapi/hapi')
 const Jwt = require('@hapi/jwt')
+const Hapi = require('@hapi/hapi')
+const Inert = require('@hapi/inert')
+const Vision = require('@hapi/vision')
+const HapiSwagger = require('hapi-swagger')
 
 const albums = require('./api/albums')
 const AlbumsValidator = require('./validator/albums')
@@ -46,6 +49,13 @@ const init = async () => {
   const playlistsService = new PlaylistsService(collaborationsService)
   const playlistSongsService = new PlaylistSongsService()
   const playlistSongActivitiesService = new PlaylistSongActivitiesService()
+
+  const swaggerOptions = {
+    info: {
+      title: 'Open Music API Documentation',
+      version: '2.0'
+    }
+  }
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -153,6 +163,12 @@ const init = async () => {
         usersService,
         validator: CollaborationsValidator
       }
+    },
+    Inert,
+    Vision,
+    {
+      plugin: HapiSwagger,
+      options: swaggerOptions
     }
   ])
 
