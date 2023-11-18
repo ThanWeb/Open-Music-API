@@ -2,9 +2,6 @@ require('dotenv').config()
 
 const Jwt = require('@hapi/jwt')
 const Hapi = require('@hapi/hapi')
-const Inert = require('@hapi/inert')
-const Vision = require('@hapi/vision')
-const HapiSwagger = require('hapi-swagger')
 
 const albums = require('./api/albums')
 const AlbumsValidator = require('./validator/albums')
@@ -50,14 +47,6 @@ const init = async () => {
   const playlistSongsService = new PlaylistSongsService()
   const playlistSongActivitiesService = new PlaylistSongActivitiesService()
 
-  const swaggerOptions = {
-    info: {
-      title: 'Open Music API Documentation',
-      version: '2.0'
-    },
-    schemes: ['http']
-  }
-
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -93,18 +82,15 @@ const init = async () => {
   server.route({
     method: 'GET',
     path: '/',
-    handler: (request, reply) => {
-      return reply.redirect('documentation').permanent()
+    handler: (request, h) => {
+      return {
+        status: 'success',
+        message: 'Welcome to Open Music API'
+      }
     }
   })
 
   await server.register([
-    Inert,
-    Vision,
-    {
-      plugin: HapiSwagger,
-      options: swaggerOptions
-    },
     {
       plugin: albums,
       options: {
