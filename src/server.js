@@ -79,14 +79,21 @@ const init = async () => {
     })
   })
 
+  await server.register(require('@hapi/vision'))
+
+  server.views({
+    engines: {
+      html: require('handlebars')
+    },
+    relativeTo: __dirname,
+    path: './template'
+  })
+
   server.route({
     method: 'GET',
     path: '/',
-    handler: (request, h) => {
-      return {
-        status: 'success',
-        message: 'Welcome to Open Music API'
-      }
+    handler: function (request, h) {
+      return h.view('index')
     }
   })
 
