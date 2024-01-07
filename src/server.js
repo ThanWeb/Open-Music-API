@@ -168,7 +168,8 @@ const init = async () => {
     {
       plugin: _exports,
       options: {
-        service: ProducerService,
+        ProducerService,
+        playlistsService,
         validator: ExportsValidator
       }
     }
@@ -178,6 +179,7 @@ const init = async () => {
     const { response } = request
 
     if (response instanceof Error) {
+      console.log(response)
       if (response instanceof ClientError) {
         const newResponse = h.response({
           status: 'fail',
