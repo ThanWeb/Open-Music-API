@@ -6,8 +6,9 @@ const NotFoundError = require('../../exceptions/NotFoundError')
 const AuthenticationError = require('../../exceptions/AuthenticationError')
 
 class UsersService {
-  constructor () {
+  constructor (cacheService) {
     this._pool = new Pool()
+    this._cacheService = cacheService
   }
 
   async addUser ({ username, password, fullname }) {
@@ -44,18 +45,24 @@ class UsersService {
   }
 
   async getUserById (userId) {
-    const query = {
-      text: 'SELECT id, username, fullname FROM users WHERE id = $1',
-      values: [userId]
+    try {
+      const result = await this._cacheService.get(`user:${userId}`)
+      return { source: 'cache', user: JSON.parse(result) }
+    } catch {
+      const query = {
+        text: 'SELECT id, username, fullname FROM users WHERE id = $1',
+        values: [userId]
+      }
+
+      const result = await this._pool.query(query)
+
+      if (!result.rowCount) {
+        throw new NotFoundError('User tidak ditemukan')
+      }
+
+      await this._cacheService.set(`user:${userId}`, JSON.stringify(result))
+      return { source: '', user: result.rows[0] }
     }
-
-    const result = await this._pool.query(query)
-
-    if (!result.rowCount) {
-      throw new NotFoundError('User tidak ditemukan')
-    }
-
-    return result.rows[0]
   }
 
   async verifyUserCredential (username, password) {

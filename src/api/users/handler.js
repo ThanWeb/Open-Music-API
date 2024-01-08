@@ -24,14 +24,18 @@ class UsersHandler {
 
   async getUserByIdHandler (request, h) {
     const { id } = request.params
-    const user = await this._service.getUserById(id)
+    const { source, user } = await this._service.getUserById(id)
 
-    return {
+    const response = h.response({
       status: 'success',
       data: {
         user
       }
-    }
+    })
+
+    if (source) response.header('X-Data-Source', source)
+
+    return response
   }
 
   async getUsersByUsernameHandler (request, h) {
