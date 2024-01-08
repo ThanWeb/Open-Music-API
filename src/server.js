@@ -5,34 +5,34 @@ const Hapi = require('@hapi/hapi')
 
 const albums = require('./api/albums')
 const AlbumsValidator = require('./validator/albums')
-const AlbumsService = require('./services/AlbumsService')
+const AlbumsService = require('./services/postgres/AlbumsService')
 
 const songs = require('./api/songs')
 const SongsValidator = require('./validator/songs')
-const SongsService = require('./services/SongsService')
+const SongsService = require('./services/postgres/SongsService')
 
 const users = require('./api/users')
-const UsersService = require('./services/UsersService')
+const UsersService = require('./services/postgres/UsersService')
 const UsersValidator = require('./validator/users')
 
 const authentications = require('./api/authentications')
-const AuthenticationsService = require('./services/AuthenticationsService')
+const AuthenticationsService = require('./services/postgres/AuthenticationsService')
 const TokenManager = require('./token/TokenManager')
 const AuthenticationsValidator = require('./validator/authentications')
 
 const playlists = require('./api/playlists')
-const PlaylistsService = require('./services/PlaylistsService')
+const PlaylistsService = require('./services/postgres/PlaylistsService')
 const PlaylistsValidator = require('./validator/playlists')
 
 const playlistSongs = require('./api/playlistSongs')
-const PlaylistSongsService = require('./services/PlaylistSongsService')
+const PlaylistSongsService = require('./services/postgres/PlaylistSongsService')
 const PlaylistSongsValidator = require('./validator/playlistSongs')
 
 const playlistSongActivities = require('./api/playlistSongActivities')
-const PlaylistSongActivitiesService = require('./services/PlaylistSongActivitiesService')
+const PlaylistSongActivitiesService = require('./services/postgres/PlaylistSongActivitiesService')
 
 const collaborations = require('./api/collaborations')
-const CollaborationsService = require('./services/CollaborationsService')
+const CollaborationsService = require('./services/postgres/CollaborationsService')
 const CollaborationsValidator = require('./validator/collaborations')
 
 const _exports = require('./api/exports')
