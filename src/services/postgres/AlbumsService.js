@@ -15,7 +15,7 @@ class AlbumsService {
 
     const query = {
       text: 'INSERT INTO albums VALUES($1, $2, $3, $4, $5, $5) RETURNING id',
-      values: [id, name, year, '', createdAt]
+      values: [id, name, year, null, createdAt]
     }
 
     const result = await this._pool.query(query)
@@ -29,7 +29,7 @@ class AlbumsService {
 
   async getAlbumById (id) {
     const query = {
-      text: 'SELECT id, name, year FROM albums WHERE id = $1',
+      text: 'SELECT id, name, year, cover FROM albums WHERE id = $1',
       values: [id]
     }
 
@@ -61,6 +61,21 @@ class AlbumsService {
 
     if (!result.rowCount) {
       throw new NotFoundError('Gagal memperbarui Album. Id tidak ditemukan')
+    }
+  }
+
+  async updateAlbumCoverById (id, { fileLocation }) {
+    const updatedAt = new Date().toISOString()
+
+    const query = {
+      text: 'UPDATE albums SET cover = $1, updated_at = $2 WHERE id = $3 RETURNING id',
+      values: [fileLocation, updatedAt, id]
+    }
+
+    const result = await this._pool.query(query)
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Gagal memperbarui Cover Album. Id tidak ditemukan')
     }
   }
 
