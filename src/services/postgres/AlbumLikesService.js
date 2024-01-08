@@ -5,8 +5,9 @@ const InvariantError = require('../../exceptions/InvariantError')
 const ClientError = require('../../exceptions/ClientError')
 
 class AlbumLikesService {
-  constructor () {
+  constructor (cacheService) {
     this._pool = new Pool()
+    this._cacheService = cacheService
   }
 
   async addAlbumLike ({ credentialId, albumId }) {
@@ -23,12 +24,13 @@ class AlbumLikesService {
       throw new InvariantError('Like pada Album gagal ditambahkan')
     }
 
+    await this._cacheService.delete(`likes:${albumId}`)
     return result.rows[0].id
   }
 
   async deleteAlbumLikeById ({ credentialId, albumId }) {
     const query = {
-      text: 'DELETE FROM user_album_likes WHERE user_id = $1 AND album_id RETURNING id',
+      text: 'DELETE FROM user_album_likes WHERE user_id = $1 AND album_id = $2 RETURNING id',
       values: [credentialId, albumId]
     }
 
@@ -37,6 +39,8 @@ class AlbumLikesService {
     if (!result.rowCount) {
       throw new NotFoundError('Like pada Album gagal dibatalkan')
     }
+
+    await this._cacheService.delete(`likes:${albumId}`)
   }
 
   async getAlbumLikeById ({ credentialId, albumId }) {
@@ -53,18 +57,24 @@ class AlbumLikesService {
   }
 
   async getAlbumLikesById (id) {
-    const query = {
-      text: 'SELECT * FROM user_album_likes WHERE album_id = $1',
-      values: [id]
+    try {
+      const result = await this._cacheService.get(`likes:${id}`)
+      return { source: 'cache', likes: JSON.parse(result) }
+    } catch {
+      const query = {
+        text: 'SELECT * FROM user_album_likes WHERE album_id = $1',
+        values: [id]
+      }
+
+      const result = await this._pool.query(query)
+
+      if (!result.rowCount) {
+        throw new NotFoundError('Jumlah Like pada Album tidak ditemukan')
+      }
+
+      await this._cacheService.set(`likes:${id}`, result.rowCount)
+      return { source: '', likes: result.rowCount }
     }
-
-    const result = await this._pool.query(query)
-
-    if (!result.rowCount) {
-      throw new NotFoundError('Jumlah Like pada Album tidak ditemukan')
-    }
-
-    return result.rowCount
   }
 }
 
